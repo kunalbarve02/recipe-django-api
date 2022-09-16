@@ -15,7 +15,7 @@ class UserSerializers(serializers.ModelSerializer):
         python object/model in datatabase
 
     Returns:
-        _type_: _description_
+        User
     """
     class Meta:
         """Model and fields passed through serializer
@@ -37,6 +37,28 @@ class UserSerializers(serializers.ModelSerializer):
             validated_data (_type_): _description_
         """
         return get_user_model().objects.create_user(**validated_data)
+
+    def update(self, instance, validated_data):
+        """
+
+        Args:
+            instance (_type_): instance that is being updated in the database
+            validated_data (_type_): data that is already passed validation
+
+        Raises:
+            serializers.ValidationError: _description_
+
+        Returns:
+            user
+        """
+        password = validated_data.pop('password', None)  # pop out password
+        user = super().update(instance, validated_data)
+
+        if password:
+            user.set_password(password)
+            user.save()
+
+        return user
 
 
 class AuthTokenSerializer(serializers.Serializer):
